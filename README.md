@@ -1,5 +1,5 @@
 # NewRep
-<h2>**1)Acronym** </h2> 
+<h2>1)Acronym </h2> 
 Introduction
 
 Convert a phrase to its acronym.
@@ -10,7 +10,7 @@ Help generate some jargon by writing a program that converts a long name like Po
 
 
 
-<h2> **2)Matrix**</h2> 
+<h2> 2)Matrix</h2> 
 Introduction
 
 Given a string representing a matrix of numbers, return the rows and columns of that matrix.
@@ -42,7 +42,7 @@ And its columns:
 8, 3, 6
 7, 2, 7
 
-<h2> **3)Meetup**</h2> 
+<h2> 3)Meetup</h2> 
 Calculate the date of meetups.
 
 Typically meetups happen on the same day of the week. In this exercise, you will take a description of a meetup date, and return the actual meetup date.
