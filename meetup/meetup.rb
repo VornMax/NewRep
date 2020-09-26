@@ -1,40 +1,35 @@
 require 'date'
 
-class Meetup
+string = "The first Monday of January 2017"
 
-  def initialize(month, year)
-    @month = month
-    @year =	year
-  end
+array_string = string.split(' ')
 
-  def day(weekday, schedule)
-    range = case schedule
-      when :first
-        1..7
-      when :second
-        8..14
-      when :third
-        15..21
-      when :fourth
-        22..28
-      when :last
-        days = Date.new(@year, @month, -1).day
-        (days - 6)..days
-      when :teenth
-        13..19
-    end
-    range.map { |e| Date.new(@year, @month, e) }.find { |e| e.send(:"#{weekday}?") }
-  end
 
+date_time = Date.parse(string)
+month = date_time.mon
+year = date_time.year
+
+
+day_of_month = array_string[1]
+range = 0
+
+if day_of_month == "first"
+      range = (1..7)
+elsif day_of_month == "second"   
+      range = (8..14) 
+elsif day_of_month == "third"
+      range = (15..21)
+elsif day_of_month == "fourth"
+      range = (22..28)
+else day_of_month == "teenth"
+      range = (13..19)
 end
 
-d = Meetup.new(1, 2017).day(:monday, :second)
-d2 = Meetup.new(1, 2017).day(:tuesday, :third)  
-d3 = Meetup.new(1, 2017).day(:wednesday, :teenth) 
-d4 = Meetup.new(1, 2017).day(:thursday, :last) 
-puts d
-puts d2
-puts d3
-puts d4
+day_of_week = array_string[2]
 
+day = range.find do |day|
+       Date.new(year, month, day).method("#{day_of_week.downcase}?").call
+end
+
+puts "#{year}/#{month}/#{day}" 
 
