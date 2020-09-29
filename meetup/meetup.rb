@@ -1,5 +1,6 @@
 require 'date'
 
+
 string = "The first Monday of January 2017"
 
 array_string = string.split(' ')
