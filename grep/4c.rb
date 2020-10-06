@@ -14,28 +14,44 @@ def grep()
 found = []
 files.each do |file|
   File.readlines(file).each_with_index do |line, index|
+    if flags.size == 1
+      # without flags
+      found << line.chomp if no_flag?(line)
 
-    # without flags
-    found << line.chomp if no_flag?(line)
+      # with flag -n
+      found << "#{file}: #{index+1}: #{line}" if flag_n?(line)
 
-    # with flag -n
-    found << "#{file}: #{index+1}: #{line}" if flag_n?(line)
+      #with flag -l
+      found << file if flag_l?(line)
 
-    #with flag -l
-    found << file if flag_l?
+      #with flag -i
+      found << line.chomp if flag_i?(line) 
 
-    #with flag -i
-    found << line.chomp if flag_i?(line) 
+      #with flag -x
+      found << line.chomp if flag_x?(line)
 
-    #with flag -x
-    found << line.chomp if flag_x?(line)
-
-    #with flag -v
-    found << line.chomp if flag_v?(line)
-        
+      #with flag -v
+      found << line.chomp if flag_v?(line)
+    elsif flags.size == 2
+      found << "#{file}: #{index+1}: #{line}" if flag_i_n?(line)
+    end   
   end
 end
-found
+check(found)
+end
+
+def flag_i_n?(line)
+  if flags.include?('-n') && flags.include?('-i')
+    line.downcase.include? word.downcase
+  end
+end
+
+def check(found)
+  if flags.include?('-l')
+    found.uniq
+  else 
+    found 
+  end
 end
 
 def no_flag?(line)
@@ -50,15 +66,15 @@ def flag_n?(line)
   end
 end
 
-def flag_l?
-  if flags.include?('-l')
-     files.size > 1
+def flag_l?(line)
+  if flags.include?('-l') && line.include?(word)
+      files.size > 1
   end
 end
 
 def flag_i?(line)
   if flags.include?('-i')
-    line.downcase.include? word
+    line.downcase.include? word.downcase
   end
 end
 
@@ -82,7 +98,7 @@ end
 
 
 
-hi = Grep.new("hello", ["-v"], ["input.txt", "input2.txt"])
+hi = Grep.new("Hello", ["-n", "-i"], ["input.txt", "input2.txt"])
 
 
 puts hi.grep()#.join("\n")
