@@ -14,9 +14,12 @@ def grep()
 found = []
 files.each do |file|
   File.readlines(file).each_with_index do |line, index|
-    if flags.size == 1
+    if flags.empty?
       # without flags
-      found << line.chomp if no_flag?(line)
+      found << line.chomp if line.include? word
+
+    elsif flags.size == 1
+      
 
       # with flag -n
       found << "#{file}: #{index+1}: #{line}" if flag_n?(line)
@@ -32,17 +35,72 @@ files.each do |file|
 
       #with flag -v
       found << line.chomp if flag_v?(line)
+
     elsif flags.size == 2
-      found << "#{file}: #{index+1}: #{line}" if flag_i_n?(line)
+      
+      #with flags -n -i
+      found << "#{file}: #{index+1}: #{line}" if flag_n_i?(line)
+
+      #with flags -n -v
+      found << "#{file}: #{index+1}: #{line}" if flag_n_v?(line)
+
+      #with flags -n -x
+      found << "#{file}: #{index+1}: #{line}" if flag_n_x?(line)
+
+      #with flags -l -v
+      found << file if flag_l_v?(line)
+
+      #with flags -i -x
+      found << line.chomp if flag_i_x?(line)
+
+    elsif flags.size == 3
+
+      #with flags -n -i -x
+      found << "#{file}: #{index+1}: #{line}" if flag_n_i_x?(line)
+      
     end   
   end
 end
 check(found)
 end
 
-def flag_i_n?(line)
+def flag_n_i_x?(line)
+  if flags.include?('-n') && flags.include?('-i') && flags.include?('-x')
+    flag_i_x?(line)
+  end
+end
+
+def flag_i_x?(line)
+  if flags.include?('-i') && flags.include?('-x')
+    if line.downcase.include? word.downcase 
+      if line.strip.chomp == word  
+        line
+      end
+    end
+  end
+end
+
+def flag_l_v?(line)
+  if flags.include?('-l') && flags.include?('-v')
+    flag_v?(line)
+  end
+end
+
+def flag_n_x?(line)
+  if flags.include?('-n') && flags.include?('-x')
+    flag_x?(line)
+  end
+end
+
+def flag_n_v?(line)
+  if flags.include?('-n') && flags.include?('-v')
+    flag_v?(line)
+  end
+end
+
+def flag_n_i?(line)
   if flags.include?('-n') && flags.include?('-i')
-    line.downcase.include? word.downcase
+    flag_i?(line)
   end
 end
 
@@ -98,7 +156,7 @@ end
 
 
 
-hi = Grep.new("Hello", ["-n", "-i"], ["input.txt", "input2.txt"])
+hi = Grep.new("hello", ["-v"], ["input.txt", "input2.txt"])
 
 
 puts hi.grep()#.join("\n")
