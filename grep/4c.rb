@@ -48,7 +48,7 @@ files.each do |file|
       found << "#{file}: #{index+1}: #{line}" if flag_n_x?(line)
 
       #with flags -l -v
-      found << file if flag_l_v?(line)
+      found << file if flag_l_v?(file, word)
 
       #with flags -i -x
       found << line.chomp if flag_i_x?(line)
@@ -57,7 +57,7 @@ files.each do |file|
 
       #with flags -n -i -x
       found << "#{file}: #{index+1}: #{line}" if flag_n_i_x?(line)
-      
+
     end   
   end
 end
@@ -75,16 +75,27 @@ def flag_i_x?(line)
     if line.downcase.include? word.downcase 
       if line.strip.chomp == word  
         line
+
       end
     end
   end
 end
 
-def flag_l_v?(line)
+
+
+
+def flag_l_v?(file, word)
   if flags.include?('-l') && flags.include?('-v')
-    flag_v?(line)
-  end
+    unless File.readlines(file).any?{ |l| l[word] }
+      file
+    end
+  end  
 end
+
+
+
+
+
 
 def flag_n_x?(line)
   if flags.include?('-n') && flags.include?('-x')
@@ -156,7 +167,7 @@ end
 
 
 
-hi = Grep.new("hello", ["-v"], ["input.txt", "input2.txt"])
+hi = Grep.new("po", ["-v", "-l"], ["input.txt", "input2.txt"])
 
 
 puts hi.grep()#.join("\n")
