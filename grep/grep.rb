@@ -64,6 +64,7 @@ end
 check(found)
 end
 
+private
 def flag_n_i_x?(line)
   if flags.include?('-n') && flags.include?('-i') && flags.include?('-x')
     flag_i_x?(line)
@@ -81,9 +82,6 @@ def flag_i_x?(line)
   end
 end
 
-
-
-
 def flag_l_v?(file, word)
   if flags.include?('-l') && flags.include?('-v')
     unless File.readlines(file).any?{ |l| l[word] }
@@ -91,11 +89,6 @@ def flag_l_v?(file, word)
     end
   end  
 end
-
-
-
-
-
 
 def flag_n_x?(line)
   if flags.include?('-n') && flags.include?('-x')
@@ -161,16 +154,14 @@ def flag_v?(line)
   end
 end
 
-
-
 end
 
 
 
-hi = Grep.new("po", ["-v", "-l"], ["input.txt", "input2.txt"])
+hi = Grep.new("hello", ["-n", "-i"], ["input.txt", "input2.txt"])
 
 
-puts hi.grep()#.join("\n")
+puts hi.grep()
 
 
 
