@@ -9,7 +9,7 @@ class User
 	  result = []
 	  each do |element|
 	    #result << block.call(element)
-	    result << x if yield(element)
+	    result << element if yield(element)
 	  end
 	  result
 	end
