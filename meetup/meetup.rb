@@ -31,5 +31,7 @@ day = range.find do |day|
        Date.new(year, month, day).method("#{day_of_week.downcase}?").call
 end
 
+
 puts "#{year}/#{month}/#{day}" 
+
 

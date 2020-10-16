@@ -1,0 +1,79 @@
+SELECT user_name, email, city, country 
+FROM users
+INNER JOIN addresses
+ON users.address_id = addresses.address_id;
+
+ user_name |        email        |   city   | country 
+-----------+---------------------+----------+---------
+ Wom1      | woman@gmail.com     | Minsk    | Belarus
+ Proto3    | prototype@gmail.com | Minsk    | Belarus
+ Man3      | mante@gmail.com     | Warshava | Poland
+ Forg12    | email@fsdf.ru       | Kiev     | Ukrain
+
+
+SELECT user_name, email, city, country 
+FROM users
+LEFT JOIN addresses
+ON users.address_id = addresses.address_id;
+
+ user_name |        email        |   city   | country 
+-----------+---------------------+----------+---------
+ Wom1      | woman@gmail.com     | Minsk    | Belarus
+ Proto3    | prototype@gmail.com | Minsk    | Belarus
+ Man3      | mante@gmail.com     | Warshava | Poland
+ Forg12    | email@fsdf.ru       | Kiev     | Ukrain
+ sahsa     | shash1@gmail.com    |          | 
+ kirill    | kir1@gmail.com      |          | 
+ vanya     | van1@gmail.com      |          | 
+
+
+SELECT user_name, email, city, country 
+FROM users
+RIGHT JOIN addresses
+ON users.address_id = addresses.address_id;
+
+ user_name |        email        |   city   | country 
+-----------+---------------------+----------+---------
+ Wom1      | woman@gmail.com     | Minsk    | Belarus
+ Proto3    | prototype@gmail.com | Minsk    | Belarus
+ Man3      | mante@gmail.com     | Warshava | Poland
+ Forg12    | email@fsdf.ru       | Kiev     | Ukrain
+           |                     | Brest    | Belarus
+
+SELECT user_name, email, city, country 
+FROM users
+FULL OUTER JOIN addresses
+ON users.address_id = addresses.address_id;
+
+ user_name |        email        |   city   | country 
+-----------+---------------------+----------+---------
+ Wom1      | woman@gmail.com     | Minsk    | Belarus
+ Proto3    | prototype@gmail.com | Minsk    | Belarus
+ Man3      | mante@gmail.com     | Warshava | Poland
+ Forg12    | email@fsdf.ru       | Kiev     | Ukrain
+ sahsa     | shash1@gmail.com    |          | 
+ kirill    | kir1@gmail.com      |          | 
+ vanya     | van1@gmail.com      |          | 
+           |                     | Brest    | Belarus
+
+
+
+SELECT addresses.country, SUM(salary)
+FROM addresses, users
+GROUP BY country;
+
+ country | sum  
+---------+------
+ Belarus | 3696
+ Ukrain  | 1848
+ Poland  | 1848
+
+
+SELECT addresses.country, SUM(salary)
+FROM addresses, users
+GROUP BY country HAVING SUM(salary) > 2000;
+
+
+ country | sum  
+---------+------
+ Belarus | 3696
