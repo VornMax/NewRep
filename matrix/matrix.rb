@@ -1,30 +1,22 @@
-field = [['9','3','4'], 
-		 ['8','5','7'], 
-		 ['6','1','0']]
+# frozen_string_literal: true
 
-puts "First matrix:"
-field.each do |line|
-			line.each do |elem|
-				print elem + ' '
-			end
-			print "\n"
+def print_matrix(field)
+  field.each do |line|
+    line.each do |elem|
+      print elem + ' '
+    end
+    print "\n"
+  end
 end
 
-field1 = field.transpose
-#field1 = [[field[0][0], field[1][0], field[2][0]],
-#          [field[0][1], field[1][1], field[2][1]],
-#          [field[0][2], field[1][2], field[2][2]]]
+field1 = [%w[9 3 4],
+          %w[8 5 7],
+          %w[6 1 0]]
 
-puts "Second matrix:"
-field1.each do |line|
-			line.each do |elem|
-				print elem + ' '
-			end
-			print "\n"
-end
+puts 'First matrix:'
+print_matrix(field1)
 
+field2 = field1.transpose
 
-	
-
-
-
+puts 'Second matrix:'
+print_matrix(field2)
