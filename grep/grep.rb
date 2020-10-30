@@ -14,35 +14,7 @@ class Grep
     found = []
     files.each do |file|
       File.readlines(file).each_with_index do |line, index|
-        if flags.empty?
-          # without flags
-          found << line.chomp if line.include? word
-        elsif flags.size == 1
-          # with flag -n
-          found << "#{file}: #{index + 1}: #{line}" if flag_n?(line)
-          # with flag -l
-          found << file if flag_l?(line)
-          # with flag -i
-          found << line.chomp if flag_i?(line)
-          # with flag -x
-          found << line.chomp if flag_x?(line)
-          # with flag -v
-          found << line.chomp if flag_v?(line)
-        elsif flags.size == 2
-          # with flags -n -i
-          found << "#{file}: #{index + 1}: #{line}" if flag_n_i?(line)
-          # with flags -n -v
-          found << "#{file}: #{index + 1}: #{line}" if flag_n_v?(line)
-          # with flags -n -x
-          found << "#{file}: #{index + 1}: #{line}" if flag_n_x?(line)
-          # with flags -l -v
-          found << file if flag_l_v?(file, word)
-          # with flags -i -x
-          found << line.chomp if flag_i_x?(line)
-        elsif flags.size == 3
-          # with flags -n -i -x
-          found << "#{file}: #{index + 1}: #{line}" if flag_n_i_x?(line)
-        end
+        how_many_flags?(index, line, found, file)
       end
     end
     check(found)
@@ -50,22 +22,68 @@ class Grep
 
   private
 
+  def how_many_flags?(index, line, found, file)
+    if flags.empty?
+      no_flag(line, found)
+    elsif flags.size == 1
+      one_flag(index, line, found, file)
+    elsif flags.size == 2
+      two_flags(index, line, found, file)
+    elsif flags.size == 3
+      three_flags(index, line, found, file)
+    end
+  end
+
+  def no_flag(line, found)
+    found << line.chomp if line.include? word
+  end
+
+  def one_flag(index, line, found, file)
+    # with flag -n
+    found << "#{file}: #{index + 1}: #{line}" if flag_n?(line)
+    # with flag -l
+    found << file if flag_l?(line)
+    # with flag -i
+    found << line.chomp if flag_i?(line)
+    # with flag -x
+    found << line.chomp if flag_x?(line)
+    # with flag -v
+    found << line.chomp if flag_v?(line)
+  end
+
+  def two_flags(index, line, found, file)
+    # with flags -n -i
+    found << "#{file}: #{index + 1}: #{line}" if flag_n_i?(line)
+    # with flags -n -v
+    found << "#{file}: #{index + 1}: #{line}" if flag_n_v?(line)
+    # with flags -n -x
+    found << "#{file}: #{index + 1}: #{line}" if flag_n_x?(line)
+    # with flags -l -v
+    found << file if flag_l_v?(file, word)
+    # with flags -i -x
+    found << line.chomp if flag_i_x?(line)
+  end
+
+  def three_flags(index, line, found, file)
+    found << "#{file}: #{index + 1}: #{line}" if flag_n_i_x?(line)
+  end
+
   def flag_n_i_x?(line)
     flag_i_x?(line) if flags.include?('-n') && flags.include?('-i') && flags.include?('-x')
   end
 
   def flag_i_x?(line)
-    if flags.include?('-i') && flags.include?('-x')
-      if line.downcase.include? word.downcase
-        line if line.strip.chomp == word
-      end
-    end
+    return unless flags.include?('-i') && flags.include?('-x')
+
+    return unless line.downcase.include? word.downcase
+
+    line if line.strip.chomp == word
   end
 
   def flag_l_v?(file, word)
-    if flags.include?('-l') && flags.include?('-v')
-      file unless File.readlines(file).any? { |l| l[word] }
-    end
+    return unless flags.include?('-l') && flags.include?('-v')
+
+    file unless File.readlines(file).any? { |l| l[word] }
   end
 
   def flag_n_x?(line)
@@ -109,12 +127,12 @@ class Grep
   end
 
   def flag_v?(line)
-    if flags.include?('-v')
-      line unless line.include? word
-    end
+    return unless flags.include?('-v')
+
+    line unless line.include? word
   end
 end
 
-hi = Grep.new('hello', ['-n', '-i'], ['input.txt', 'input2.txt'])
+hi = Grep.new('hello', ['-v'], ['input.txt', 'input2.txt'])
 
 puts hi.grep
