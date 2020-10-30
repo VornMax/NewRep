@@ -5,9 +5,10 @@ class Queens
   def initialize(white = nil, black = nil)
     @white = white
     @black = black
-    raise ArgumentError, "You don't enter a position." if correct_value?
-  rescue StandardError => e
-    p e
+  #   raise ArgumentError, "You don't enter a position." if correct_value?
+  # rescue StandardError => msg
+  #   p msg
+    check_position
   end
 
   def create_field
@@ -23,12 +24,19 @@ class Queens
     puts attack?
   end
 
-  private
+  def check_position
+    return unless correct_value?
+
+    puts "You don't enter a position."
+    exit!
+  end
 
   def correct_value?
     @black.nil? || @black.all? { |i| i >= 0 && i <= 7 }
     @white.nil? || @white.all? { |i| i >= 0 && i <= 7 }
   end
+
+  private
 
   def attack?
     same_row? || same_col? || same_diag?
