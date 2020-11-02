@@ -58,16 +58,18 @@ class Grep
     found << "#{file}: #{index + 1}: #{line}" if flag_n_i_x?(line)
   end
 
+  # three flags
   def flag_n_i_x?(line)
-    flag_i_x?(line) if flags.include?('-n') && flags.include?('-i') && flags.include?('-x')
+    flag_i_x?(line) && flags.include?('-n')
   end
 
+  # Two flags
   def flag_i_x?(line)
-    return unless flags.include?('-i') && flags.include?('-x')
+    return unless flags.include?('-i')
 
     return unless line.downcase.include? word.downcase
 
-    line if x_flag(line)
+    flag_x?(line)
   end
 
   def flag_l_v?(file, word)
@@ -77,15 +79,38 @@ class Grep
   end
 
   def flag_n_x?(line)
-    flag_x?(line) if flags.include?('-n') && flags.include?('-x')
+    flag_x?(line) && flags.include?('-n')
   end
 
   def flag_n_v?(line)
-    flag_v?(line) if flags.include?('-n') && flags.include?('-v')
+    flag_v?(line) && flags.include?('-n')
   end
 
   def flag_n_i?(line)
-    flag_i?(line) if flags.include?('-n') && flags.include?('-i')
+    flag_i?(line) && flags.include?('-n')
+  end
+
+  # One flag
+  def flag_n?(line)
+    line.include?(word) && flags.include?('-n')
+  end
+
+  def flag_l?(line)
+    files.size > 1 && flags.include?('-l') && line.include?(word)
+  end
+
+  def flag_i?(line)
+    flags.include?('-i') && line.downcase.include?(word.downcase)
+  end
+
+  def flag_x?(line)
+    line.strip.chomp == word && flags.include?('-x')
+  end
+
+  def flag_v?(line)
+    return unless flags.include?('-v')
+
+    line unless line.include? word
   end
 
   def check(found)
@@ -95,50 +120,8 @@ class Grep
       found
     end
   end
-
-  def no_flag?(line)
-    match_line(line) if flags.include?('')
-  end
-
-  def flag_n?(line)
-    match_line(line) if flags.include?('-n')
-  end
-
-  def flag_l?(line)
-    files.size > 1 if flags.include?('-l') && line.include?(word)
-  end
-
-  def flag_i?(line)
-    i_flag(line) if flags.include?('-i')
-  end
-
-  def flag_x?(line)
-    x_flag(line) if flags.include?('-x')
-  end
-
-  def flag_v?(line)
-    return unless flags.include?('-v')
-
-    v_flag(line)
-  end
-
-  def match_line(line)
-    line.include? word
-  end
-
-  def i_flag(line)
-    line.downcase.include? word.downcase
-  end
-
-  def x_flag(line)
-    line.strip.chomp == word
-  end
-
-  def v_flag(line)
-    line unless line.include? word
-  end
 end
 
-hi = Grep.new('hello', ['-l'], ['input.txt', 'input2.txt'])
+hi = Grep.new('bo', ['-v', '-l'], ['input.txt', 'input2.txt'])
 
 puts hi.grep
