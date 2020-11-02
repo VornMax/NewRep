@@ -14,7 +14,7 @@ class Grep
     found = []
     files.each do |file|
       File.readlines(file).each_with_index do |line, index|
-        how_many_flags?(index, line, found, file)
+        how_flags(index, line, found, file)
       end
     end
     check(found)
@@ -22,7 +22,7 @@ class Grep
 
   private
 
-  def how_many_flags?(index, line, found, file)
+  def how_flags(index, line, found, file)
     if flags.empty?
       no_flag(line, found)
     elsif flags.size == 1
@@ -39,29 +39,19 @@ class Grep
   end
 
   def one_flag(index, line, found, file)
-    # with flag -n
     found << "#{file}: #{index + 1}: #{line}" if flag_n?(line)
-    # with flag -l
     found << file if flag_l?(line)
-    # with flag -i
-    found << line.chomp if flag_i?(line)
-    # with flag -x
-    found << line.chomp if flag_x?(line)
-    # with flag -v
-    found << line.chomp if flag_v?(line)
+    return unless flag_i?(line) || flag_x?(line) || flag_v?(line)
+
+    found << line.chomp
   end
 
   def two_flags(index, line, found, file)
-    # with flags -n -i
-    found << "#{file}: #{index + 1}: #{line}" if flag_n_i?(line)
-    # with flags -n -v
-    found << "#{file}: #{index + 1}: #{line}" if flag_n_v?(line)
-    # with flags -n -x
-    found << "#{file}: #{index + 1}: #{line}" if flag_n_x?(line)
-    # with flags -l -v
     found << file if flag_l_v?(file, word)
-    # with flags -i -x
     found << line.chomp if flag_i_x?(line)
+    return unless flag_n_i?(line) || flag_n_v?(line) || flag_n_x?(line)
+
+    found << "#{file}: #{index + 1}: #{line}"
   end
 
   def three_flags(index, line, found, file)
@@ -77,7 +67,7 @@ class Grep
 
     return unless line.downcase.include? word.downcase
 
-    line if line.strip.chomp == word
+    line if x_flag(line)
   end
 
   def flag_l_v?(file, word)
@@ -107,11 +97,11 @@ class Grep
   end
 
   def no_flag?(line)
-    line.include? word if flags.include?('')
+    match_line(line) if flags.include?('')
   end
 
   def flag_n?(line)
-    line.include? word if flags.include?('-n')
+    match_line(line) if flags.include?('-n')
   end
 
   def flag_l?(line)
@@ -119,20 +109,36 @@ class Grep
   end
 
   def flag_i?(line)
-    line.downcase.include? word.downcase if flags.include?('-i')
+    i_flag(line) if flags.include?('-i')
   end
 
   def flag_x?(line)
-    line.strip.chomp == word if flags.include?('-x')
+    x_flag(line) if flags.include?('-x')
   end
 
   def flag_v?(line)
     return unless flags.include?('-v')
 
+    v_flag(line)
+  end
+
+  def match_line(line)
+    line.include? word
+  end
+
+  def i_flag(line)
+    line.downcase.include? word.downcase
+  end
+
+  def x_flag(line)
+    line.strip.chomp == word
+  end
+
+  def v_flag(line)
     line unless line.include? word
   end
 end
 
-hi = Grep.new('hello', ['-v'], ['input.txt', 'input2.txt'])
+hi = Grep.new('hello', ['-l'], ['input.txt', 'input2.txt'])
 
 puts hi.grep

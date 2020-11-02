@@ -5,10 +5,9 @@ class Queens
   def initialize(white = nil, black = nil)
     @white = white
     @black = black
-  #   raise ArgumentError, "You don't enter a position." if correct_value?
-  # rescue StandardError => msg
-  #   p msg
-    check_position
+    raise ArgumentError, "You don't enter a position." if correct_value?
+  rescue StandardError => e
+    p e
   end
 
   def create_field
@@ -22,13 +21,6 @@ class Queens
     end
     print_array(array)
     puts attack?
-  end
-
-  def check_position
-    return unless correct_value?
-
-    puts "You don't enter a position."
-    exit!
   end
 
   def correct_value?
@@ -66,7 +58,7 @@ class Queens
 end
 
 # qa = Queens.new(white = [5, 6], black = [7, 4])
-qa = Queens.new([4, 6], [4, 4])
-# qa = Queens.new(black = [1, 1])
+# qa = Queens.new([4, 6], [4, 4])
+qa = Queens.new(black = [1, 1])
 # qa = Queens.new( white = [2, 4])
 qa.create_field
