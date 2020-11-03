@@ -14,15 +14,15 @@ class Grep
     found = []
     files.each do |file|
       File.readlines(file).each_with_index do |line, index|
-        how_flags(index, line, found, file)
+        checking_flags(index, line, found, file)
       end
     end
-    check(found)
+    check_uniq(found)
   end
 
   private
 
-  def how_flags(index, line, found, file)
+  def checking_flags(index, line, found, file)
     if flags.empty?
       no_flag(line, found)
     elsif flags.size == 1
@@ -35,7 +35,7 @@ class Grep
   end
 
   def no_flag(line, found)
-    found << line.chomp if line.include? word
+    found << line.chomp if line.include?(word)
   end
 
   def one_flag(index, line, found, file)
@@ -65,11 +65,7 @@ class Grep
 
   # Two flags
   def flag_i_x?(line)
-    return unless flags.include?('-i')
-
-    return unless line.downcase.include? word.downcase
-
-    flag_x?(line)
+    flag_i?(line) && flag_x?(line)
   end
 
   def flag_l_v?(file, word)
@@ -79,7 +75,7 @@ class Grep
   end
 
   def flag_n_x?(line)
-    flag_x?(line) && flags.include?('-n')
+    flag_x?(line) && flag_n?(line)
   end
 
   def flag_n_v?(line)
@@ -87,7 +83,7 @@ class Grep
   end
 
   def flag_n_i?(line)
-    flag_i?(line) && flags.include?('-n')
+    flag_i?(line) && flag_n?(line)
   end
 
   # One flag
@@ -113,7 +109,7 @@ class Grep
     line unless line.include? word
   end
 
-  def check(found)
+  def check_uniq(found)
     if flags.include?('-l')
       found.uniq
     else
@@ -122,6 +118,6 @@ class Grep
   end
 end
 
-hi = Grep.new('bo', ['-v', '-l'], ['input.txt', 'input2.txt'])
+hi = Grep.new('hello', ['-n'], ['input.txt', 'input2.txt'])
 
 puts hi.grep
