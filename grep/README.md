@@ -22,8 +22,8 @@ If we were to call grep "hello" input.txt, the returned string should be:
 ```
 hello
 hello again
-Flags
 ```
+Flags
 As said earlier, the grep command should also support the following flags:
 
 - -n Print the line numbers of each matching line.
