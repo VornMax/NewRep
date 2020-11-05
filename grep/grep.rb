@@ -14,7 +14,7 @@ class Grep
     found = []
     files.each do |file|
       File.readlines(file).each_with_index do |line, index|
-        checking_flags(index, line, found, file)
+        output(found, line, index, file) if match?(line)
       end
     end
     check_uniq(found)
@@ -22,95 +22,60 @@ class Grep
 
   private
 
-  def checking_flags(index, line, found, file)
-    if flags.empty?
-      no_flag(line, found)
-    elsif flags.size == 1
-      one_flag(index, line, found, file)
-    elsif flags.size == 2
-      two_flags(index, line, found, file)
-    elsif flags.size == 3
-      three_flags(index, line, found, file)
+  def output(found, line, index, file)
+    out = line.chop
+    out = "#{index + 1}: " + out if line_number?
+    out = "#{file}:" + out if files.size > 1
+    out = file if file_name?
+    found << out
+  end
+
+  def match?(line)
+    if invert?
+      line !~ other_checks
+    else
+      line =~ other_checks
     end
   end
 
-  def no_flag(line, found)
-    found << line.chomp if line.include?(word)
+  def other_checks
+    if without_register?
+      /#{check_word}/i
+    else
+      /#{check_word}/
+    end
   end
 
-  def one_flag(index, line, found, file)
-    found << "#{file}: #{index + 1}: #{line}" if flag_n?(line)
-    found << file if flag_l?(line)
-    return unless flag_i?(line) || flag_x?(line) || flag_v?(line)
-
-    found << line.chomp
+  def check_word
+    if entire_line?
+      "^#{word}$"
+    else
+      word
+    end
   end
 
-  def two_flags(index, line, found, file)
-    found << file if flag_l_v?(file, word)
-    found << line.chomp if flag_i_x?(line)
-    return unless flag_n_i?(line) || flag_n_v?(line) || flag_n_x?(line)
-
-    found << "#{file}: #{index + 1}: #{line}"
+  def line_number?
+    flags.include?('-n')
   end
 
-  def three_flags(index, line, found, file)
-    found << "#{file}: #{index + 1}: #{line}" if flag_n_i_x?(line)
+  def file_name?
+    flags.include?('-l')
   end
 
-  # three flags
-  def flag_n_i_x?(line)
-    flag_i_x?(line) && flags.include?('-n')
+  def without_register?
+    flags.include?('-i')
   end
 
-  # Two flags
-  def flag_i_x?(line)
-    flag_i?(line) && flag_x?(line)
+  def entire_line?
+    flags.include?('-x')
   end
 
-  def flag_l_v?(file, word)
-    return unless flags.include?('-l') && flags.include?('-v')
-
-    file unless File.readlines(file).any? { |l| l[word] }
-  end
-
-  def flag_n_x?(line)
-    flag_x?(line) && flag_n?(line)
-  end
-
-  def flag_n_v?(line)
-    flag_v?(line) && flags.include?('-n')
-  end
-
-  def flag_n_i?(line)
-    flag_i?(line) && flag_n?(line)
-  end
-
-  # One flag
-  def flag_n?(line)
-    line.include?(word) && flags.include?('-n')
-  end
-
-  def flag_l?(line)
-    files.size > 1 && flags.include?('-l') && line.include?(word)
-  end
-
-  def flag_i?(line)
-    flags.include?('-i') && line.downcase.include?(word.downcase)
-  end
-
-  def flag_x?(line)
-    line.strip.chomp == word && flags.include?('-x')
-  end
-
-  def flag_v?(line)
-    return unless flags.include?('-v')
-
-    line unless line.include? word
+  def invert?
+    flags.include?('-v')
   end
 
   def check_uniq(found)
-    if flags.include?('-l')
+    if file_name?
       found.uniq
     else
       found
@@ -118,6 +83,5 @@ class Grep
   end
 end
 
-hi = Grep.new('hello', ['-n'], ['input.txt', 'input2.txt'])
-
+hi = Grep.new('hello', ['-v'], ['input.txt', 'input2.txt'])
 puts hi.grep
